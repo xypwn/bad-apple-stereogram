@@ -138,7 +138,7 @@ void img_draw_autostereogram(uint32_t *dst, uint8_t *src, int width, int height,
 	for (int y = 0; y < height; ++y) {	
 		for (int x = 0; x < width; ++x)
 			same[x] = x;
-		
+
 		for (int x = 0; x < width; ++x) {
 			double val = (double)src[y*width + x] / 255.0;
 			int s = round((1-close_ratio*val)*eyedist/(2-close_ratio*val));
@@ -193,7 +193,6 @@ typedef struct {
 static void *thread_decode(void *vargp) {
 	ThreadDecodeData *data = (ThreadDecodeData*)vargp;
 	avdecode_run(data->avinfo, on_vframe, on_aframe, data->userdata);
-	fflush(stdout);
 	return NULL;
 }
 
@@ -231,7 +230,7 @@ int main(void) {
 		printf("circ_buf_create failed\n");
 		return 1;
 	}
-	
+
 	pthread_t thread_decode_id;
 
 	ThreadDecodeData thread_decode_data = {
@@ -329,7 +328,7 @@ int main(void) {
 
 		double audio_time = (double)atomic_load(&audio_pos) / (double)(aspec.freq * avinfo.a_n_channels * avinfo.a_sample_size);
 		size_t video_target_frame = audio_time * avinfo.v_fps;
-		
+
 		uint64_t time_now = SDL_GetTicks64();
 		if (time_now - debuginf_last_time >= DEBUGINF_PERIOD) {
 			size_t bytes_per_sample = avinfo.a_n_channels * avinfo.a_sample_size;
@@ -345,7 +344,7 @@ int main(void) {
 			printf("     \r");
 			debuginf_last_time = time_now;
 		}
-		
+
 		if (time_now - fps_last_time >= 1000) {
 			fps = fps_acc;
 			fps_acc = 0;	
@@ -387,7 +386,7 @@ int main(void) {
 		SDL_RenderCopy(rend, tex, NULL, NULL);
 		SDL_RenderPresent(rend);
 	}
-	
+
 	SDL_CloseAudioDevice(audiodev);
 	circ_buf_destroy(videobuf);
 	circ_buf_destroy(audiobuf);

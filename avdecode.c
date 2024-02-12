@@ -13,17 +13,17 @@ typedef struct AVDecodePrivState {
 static void open_codec(int *stream_index, AVCodecContext **dec_ctx, AVFormatContext *fmt_ctx, enum AVMediaType type) {
 	int ret;
 	const AVCodec *codec;
-	
+
 	ret = av_find_best_stream(fmt_ctx, type, -1, -1, &codec, 0);
 	assert(ret >= 0);
 	*stream_index = ret;
-	
+
 	*dec_ctx = avcodec_alloc_context3(codec);
 	assert(*dec_ctx);
 
 	ret = avcodec_parameters_to_context(*dec_ctx, fmt_ctx->streams[*stream_index]->codecpar);
 	assert(ret == 0);
-	
+
 	ret = avcodec_open2(*dec_ctx, codec, NULL);
 	assert(ret == 0);
 }
@@ -38,14 +38,14 @@ static void decode_packet(
 ) {
 	int ret = avcodec_send_packet(dec_ctx, packet);
 	assert(ret == 0);
-	
+
 	while (1) {
 		ret = avcodec_receive_frame(dec_ctx, frame);
 		if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
 			break;
 		} else
 			assert(ret == 0);
-		
+
 		if (dec_ctx->codec->type == AVMEDIA_TYPE_VIDEO) {
 			ret = on_vframe(frame->data[0], frame->format, frame->width, frame->height, frame->linesize[0], userdata);
 			assert(ret == 0);
@@ -64,16 +64,16 @@ AVDecodeInfo avdecode_prepare(const char *filename) {
 	*info.priv = (AVDecodePrivState){0};
 
 	int ret;
-	
+
 	ret = avformat_open_input(&info.priv->fmt_ctx, filename, NULL, NULL);
 	assert(ret == 0);
-	
+
 	ret = avformat_find_stream_info(info.priv->fmt_ctx, NULL);
 	assert(ret == 0);
-	
+
 	open_codec(&info.priv->video_stream_index, &info.priv->video_dec_ctx, info.priv->fmt_ctx, AVMEDIA_TYPE_VIDEO);
 	open_codec(&info.priv->audio_stream_index, &info.priv->audio_dec_ctx, info.priv->fmt_ctx, AVMEDIA_TYPE_AUDIO);
-	
+
 	info.v_width = info.priv->video_dec_ctx->width;
 	info.v_height = info.priv->video_dec_ctx->height;
 	{
@@ -81,12 +81,12 @@ AVDecodeInfo avdecode_prepare(const char *filename) {
 		info.v_fps = (double)fps.num / (double)fps.den;
 	}
 	info.v_format = info.priv->video_dec_ctx->pix_fmt;
-	
+
 	info.a_n_channels = info.priv->audio_dec_ctx->ch_layout.nb_channels;
 	info.a_sample_rate = info.priv->audio_dec_ctx->sample_rate;
 	info.a_sample_size = av_get_bytes_per_sample(info.priv->audio_dec_ctx->sample_fmt);
 	info.a_format = info.priv->audio_dec_ctx->sample_fmt;
-	
+
 	return info;
 }
 
@@ -101,7 +101,7 @@ void avdecode_run(
 
 	AVPacket *packet = av_packet_alloc();
 	assert(packet);
-	
+
 	while (av_read_frame(info.priv->fmt_ctx, packet) >= 0) {		
 		if (packet->stream_index == info.priv->video_stream_index) {
 			decode_packet(info.priv->video_dec_ctx, frame, packet, on_vframe, on_aframe, userdata);
@@ -111,10 +111,10 @@ void avdecode_run(
 
 		av_packet_unref(packet);
 	}
-	
+
 	decode_packet(info.priv->video_dec_ctx, frame, NULL, on_vframe, on_aframe, userdata);
 	decode_packet(info.priv->audio_dec_ctx, frame, NULL, on_vframe, on_aframe, userdata);
-	
+
 	avcodec_free_context(&info.priv->video_dec_ctx);
 	avcodec_free_context(&info.priv->audio_dec_ctx);
 	avformat_close_input(&info.priv->fmt_ctx);
