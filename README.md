@@ -1,5 +1,8 @@
 # bad-apple-stereogram
 
+![screenshot in normal mode](shot_normal.png)
+![screenshot in stereogram mode](shot_stereogram.png)
+
 ## Setup/usage
 
 Download https://www.youtube.com/watch?v=FtutLA63Cp8 in 360p and save it to "bad-apple.mp4".
