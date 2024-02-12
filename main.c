@@ -107,7 +107,7 @@ static void audio_callback(void *userdata, uint8_t *stream, int len) {
 
 int on_vframe(uint8_t *data, enum AVPixelFormat format, int width, int height, int linesize, void *userdata) {
 	//printf("saving frame %llu, fmt: %s, %d\n", videobuf_frames, av_get_pix_fmt_name(format), linesize);
-	//fflush(stdout);	
+	//fflush(stdout);
 	for (int i = 0; i < height; ++i) {
 		circ_buf_write(videobuf, data + i*linesize, width);
 	}
@@ -135,7 +135,7 @@ int on_aframe(uint8_t **data, enum AVSampleFormat format, int n_channels, int n_
 void img_draw_autostereogram(uint32_t *dst, uint8_t *src, int width, int height, int eyedist /*in pixels*/, double close_ratio, RNG *rng) {
 	uint32_t *pix = malloc(sizeof(int) * width);
 	int *same = malloc(sizeof(int) * width);
-	for (int y = 0; y < height; ++y) {	
+	for (int y = 0; y < height; ++y) {
 		for (int x = 0; x < width; ++x)
 			same[x] = x;
 
@@ -197,7 +197,7 @@ static void *thread_decode(void *vargp) {
 }
 
 int main(void) {
-	AVDecodeInfo avinfo = avdecode_prepare("bad-apple.mp4");	
+	AVDecodeInfo avinfo = avdecode_prepare("bad-apple.mp4");
 
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
 		printf("SDL_Init failed: %s\n", SDL_GetError());
@@ -262,7 +262,7 @@ int main(void) {
 	spec.samples = 1024;
 	spec.callback = audio_callback;
 	spec.userdata = &avinfo;
-	
+
 	int audiodev = SDL_OpenAudioDevice(NULL, 0, &spec, &aspec, SDL_AUDIO_ALLOW_SAMPLES_CHANGE);
 	assert(audiodev > 0);
 	SDL_PauseAudioDevice(audiodev, 0);
@@ -276,7 +276,7 @@ int main(void) {
 	size_t video_frame = 0;
 	bool force_redraw = false;
 	uint8_t *framebuf = malloc(avinfo.v_width * avinfo.v_height);
-	
+
 	uint64_t debuginf_last_time = 0;
 	uint64_t fps_last_time = 0;
 	size_t fps_acc = 0;
@@ -347,7 +347,7 @@ int main(void) {
 
 		if (time_now - fps_last_time >= 1000) {
 			fps = fps_acc;
-			fps_acc = 0;	
+			fps_acc = 0;
 			fps_last_time = time_now;
 		}
 
@@ -379,7 +379,7 @@ int main(void) {
 				return 1;
 			}
 		}
-		
+
 		++fps_acc;
 
 		SDL_RenderClear(rend);

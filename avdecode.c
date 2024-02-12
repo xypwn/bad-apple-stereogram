@@ -102,7 +102,7 @@ void avdecode_run(
 	AVPacket *packet = av_packet_alloc();
 	assert(packet);
 
-	while (av_read_frame(info.priv->fmt_ctx, packet) >= 0) {		
+	while (av_read_frame(info.priv->fmt_ctx, packet) >= 0) {
 		if (packet->stream_index == info.priv->video_stream_index) {
 			decode_packet(info.priv->video_dec_ctx, frame, packet, on_vframe, on_aframe, userdata);
 		} else if (packet->stream_index == info.priv->audio_stream_index) {
