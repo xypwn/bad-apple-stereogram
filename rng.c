@@ -2,6 +2,7 @@
 
 #include <math.h>
 #include <float.h>
+#include <stddef.h>
 
 // xoshiro256** 1.0,
 // derived from David Blackman and Sebastiano Vigna's public domain implmentation
